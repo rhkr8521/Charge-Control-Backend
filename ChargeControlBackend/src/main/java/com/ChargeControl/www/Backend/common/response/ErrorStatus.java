@@ -25,6 +25,7 @@ public enum ErrorStatus {
     KAKAO_UNAUTHORIZED_USER("카카오 로그인 실패. 만료되었거나 잘못된 카카오 토큰입니다."),
     SIGNIN_REQUIRED("access, refreshToken 모두 만료되었습니다. 재로그인이 필요합니다."),
     VALID_ACCESS_TOKEN("아직 유효한 accessToken 입니다."),
+    UNCORRECT_PASSWORD("비밀번호가 일치하지 않습니다."),
 
     /**
      * 404 NOT_FOUND
