@@ -39,14 +39,15 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 
 	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	//H2
-	runtimeOnly'com.h2database:h2'
+	// MYSQL
+   	implementation 'mysql:mysql-connector-java:8.0.32'
 }
 
 tasks.named('test') {
