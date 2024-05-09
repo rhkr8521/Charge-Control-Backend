@@ -34,6 +34,9 @@ dependencies {
 	// validation
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+	// Mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail:3.2.2'
+
 	// lombok
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
@@ -47,7 +50,10 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
 	// MYSQL
-   	implementation 'mysql:mysql-connector-java:8.0.32'
+   	//implementation 'mysql:mysql-connector-java:8.0.32'
+
+	// H2
+	runtimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
