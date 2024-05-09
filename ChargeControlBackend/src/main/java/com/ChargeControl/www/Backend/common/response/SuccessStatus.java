@@ -15,6 +15,8 @@ public enum SuccessStatus {
     SIGNUP_SUCCESS(HttpStatus.CREATED, "회원가입 성공"),
     SIGNIN_SUCCESS(HttpStatus.OK, "로그인 성공"),
     GET_NEW_TOKEN_SUCCESS(HttpStatus.OK,"토큰 재발급 성공"),
+    EMAIL_SEND_SUCCESS(HttpStatus.CREATED, "이메일 인증코드 발송하였습니다."),
+    EMAIL_VERIFY_SUCCESS(HttpStatus.OK, "이메일 인증이 완료되었습니다."),
     ;
 
     private final HttpStatus httpStatus;

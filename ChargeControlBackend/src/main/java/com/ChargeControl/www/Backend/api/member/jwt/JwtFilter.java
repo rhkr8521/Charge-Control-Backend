@@ -1,12 +1,14 @@
 package com.ChargeControl.www.Backend.api.member.jwt;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
@@ -14,47 +16,47 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
 
-@RequiredArgsConstructor
+@Component
 public class JwtFilter extends OncePerRequestFilter {
 
+    @Lazy
+    @Autowired
+    private UserDetailsService userDetailsService;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Value("${jwt.secret}")
-    private final String secretKey;
+    private String secretKey;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+        final String authorizationHeader = request.getHeader("Authorization");
 
-        final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-        logger.info("authorization : " + authorization);
+        String email = null;
+        String jwt = null;
 
-        //token 안
-        if (authorization == null || !authorization.startsWith("Bearer ")){
-            logger.error("authorization을 잘못 보냈습니다.");
-            filterChain.doFilter(request, response);
-            return;
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            jwt = authorizationHeader.substring(7);
+            email = jwtUtil.getUserEmail(jwt, secretKey);
         }
 
-        //token 꺼내기
-        String token = authorization.split(" ")[1];
-        logger.info("token : " + token);
+        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(email);
 
-        //token Expired되었는지
-        if(JwtUtil.isExpired(token, secretKey)){
-            logger.error("Token이 만료 되었습니다.");
-            filterChain.doFilter(request, response);
-            return;
+            if (jwtUtil.isExpired(jwt, secretKey) == false) {
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                System.out.println("Authentication successful for user: " + email);
+            } else {
+                System.out.println("JWT token is expired");
+            }
         }
 
-        //useremail token에서 꺼내기
-        String userEmail = JwtUtil.getUserEmail(token, secretKey);
-        logger.info("email: " + userEmail);
-
-
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(userEmail, null, List.of(new SimpleGrantedAuthority("USER")));
-        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
     }
 }

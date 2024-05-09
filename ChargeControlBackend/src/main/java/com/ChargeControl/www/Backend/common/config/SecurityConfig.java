@@ -1,42 +1,62 @@
 package com.ChargeControl.www.Backend.common.config;
 
-import lombok.RequiredArgsConstructor;
+import com.ChargeControl.www.Backend.api.member.jwt.JwtFilter;
+import com.ChargeControl.www.Backend.api.member.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private static final String[] SWAGGER_URL = {
-            "/swagger-resources/**",
-            "/favicon.ico",
-            "/api-docs/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/swagger-ui/index.html",
-            "/docs/swagger-ui/index.html",
-            "/swagger-ui/swagger-ui.css",
-    };
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtFilter jwtFilter;
+
+    @Autowired
+    public SecurityConfig(CustomUserDetailsService customUserDetailsService, JwtFilter jwtFilter) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.jwtFilter = jwtFilter;
+    }
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public PasswordEncoder passwordEncoder() {
+        return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .headers().frameOptions().disable()
+                .cors().and()
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/api/v1/login", "/api/v1/join", "/api/v1/verify-email", "/api/v1/verification-code", "/h2-console/**").permitAll()
+                        .anyRequest().authenticated())
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .httpBasic().disable()
-                .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/h2-console/**").permitAll() // h2-console 경로에 대한 접근을 허용합니다.
-                        .requestMatchers("/api/v1/**").permitAll() // h2-console 경로에 대한 접근을 허용합니다.
-                        .anyRequest().authenticated()) // 나머지 요청들은 인증을 요구합니다.
-                .httpBasic(); // 필요에 따라 다른 인증 방식을 선택할 수 있습니다.
+                .headers().frameOptions().sameOrigin()
+                .and()
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.authenticationProvider(authenticationProvider());
 
         return http.build();
     }
 
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
 }

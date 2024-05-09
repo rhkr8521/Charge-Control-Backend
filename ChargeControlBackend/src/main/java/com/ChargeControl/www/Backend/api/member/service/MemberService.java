@@ -12,7 +12,7 @@ public interface MemberService {
 
     Long signUp(MemberSignUpRequestDto requestDto) throws Exception;
 
-    String generateToken(String username);
+    String generateToken(Member member);
 
     Optional<Member> findByToken(String token);
 
