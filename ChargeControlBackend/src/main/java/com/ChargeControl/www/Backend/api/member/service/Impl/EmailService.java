@@ -39,7 +39,7 @@ public class EmailService {
         SimpleMailMessage mailMessage = new SimpleMailMessage();
         mailMessage.setFrom(serviceEmail);
         mailMessage.setTo(email);
-        mailMessage.setSubject("Email Verification For " + email);
+        mailMessage.setSubject("ChargeControl 회원가입 인증코드 입니다.");
         mailMessage.setText(verification.generateCodeMessage());
         mailSender.send(mailMessage);
     }
