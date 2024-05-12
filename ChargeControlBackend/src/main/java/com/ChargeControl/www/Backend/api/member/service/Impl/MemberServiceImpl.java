@@ -34,7 +34,7 @@ public class MemberServiceImpl implements MemberService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private Long accessTokenValidityMs = 900_000L; // 1 hour for accessToken
+    private Long accessTokenValidityMs = 900_000L; // 엑세스토큰 15분 유효시간
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -91,7 +91,7 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("No user found with email: " + email));
 
         String newRefreshToken = UUID.randomUUID().toString();
-        Instant newExpiryDate = Instant.now().plusMillis(7 * 24 * 60 * 60 * 1000);
+        Instant newExpiryDate = Instant.now().plusMillis(7 * 24 * 60 * 60 * 1000); // 리프레시토큰 일주일 유효시간
 
         member.updateRefreshToken(newRefreshToken, newExpiryDate);
 
