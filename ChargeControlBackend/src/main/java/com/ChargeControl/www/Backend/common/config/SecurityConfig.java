@@ -2,6 +2,7 @@ package com.ChargeControl.www.Backend.common.config;
 
 import com.ChargeControl.www.Backend.api.member.jwt.JwtFilter;
 import com.ChargeControl.www.Backend.api.member.service.CustomUserDetailsService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 @Configuration
 @EnableWebSecurity
@@ -36,20 +41,35 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
-                .cors().and()
+                .csrf((csrfConfig) ->
+                        csrfConfig.disable()
+                )
+                .cors(corsCustomizer -> corsCustomizer.configurationSource(new CorsConfigurationSource() {
+                    @Override
+                    public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+                        config.setAllowedMethods(Collections.singletonList("*"));
+                        config.setAllowCredentials(true);
+                        config.setAllowedHeaders(Collections.singletonList("*"));
+                        config.setMaxAge(3600L); //1시간
+                        return config;
+                    }
+                }))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/v1/login", "/api/v1/join", "/api/v1/verify-email", "/api/v1/verification-code", "api/v1/refreshToken", "/h2-console/**").permitAll()
+                        .requestMatchers("health","/api/v1/login", "/api/v1/join", "/api/v1/verify-email", "/api/v1/verification-code", "api/v1/refreshToken", "/h2-console/**").permitAll()
                         .anyRequest().authenticated())
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .headers().frameOptions().sameOrigin()
-                .and()
+                .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers((headerConfig) ->
+                        headerConfig.frameOptions(frameOptionsConfig ->
+                                frameOptionsConfig.disable()
+                        )
+                )
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling()
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                });
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling.authenticationEntryPoint((request, response, authException) -> {
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                        }));
 
         http.authenticationProvider(authenticationProvider());
 
