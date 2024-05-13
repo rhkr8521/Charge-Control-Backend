@@ -34,7 +34,7 @@ public class MemberServiceImpl implements MemberService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private Long accessTokenValidityMs = 3600_000L; // 1 hour for accessToken
+    private Long accessTokenValidityMs = 900_000L; // 엑세스토큰 15분 유효시간
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -91,25 +91,24 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new IllegalArgumentException("No user found with email: " + email));
 
         String newRefreshToken = UUID.randomUUID().toString();
-        Instant newExpiryDate = Instant.now().plusMillis(600000);
+        Instant newExpiryDate = Instant.now().plusMillis(7 * 24 * 60 * 60 * 1000); // 리프레시토큰 일주일 유효시간
 
         member.updateRefreshToken(newRefreshToken, newExpiryDate);
 
         return memberRepository.save(member);
     }
 
-    public Optional<Member> findByToken(String token){
-        return memberRepository.findByRefreshToken(token);
-    }
-
-    @Override
     public void verifyRefreshTokenExpiration(String token) {
         Member member = findByToken(token)
-                .orElseThrow(() -> new RuntimeException("Invalid refresh token."));
+                .orElseThrow(() -> new BadRequestException("유효한 RefreshToken이 아닙니다."));
 
         if (member.getExpiryDate().isBefore(Instant.now())) {
-            throw new RuntimeException("Refresh token expired. Please log in again.");
+            throw new BadRequestException("인증이 만료되었습니다. 재로그인 하십시오.");
         }
+    }
+
+    public Optional<Member> findByToken(String token) {
+        return memberRepository.findByRefreshToken(token);
     }
 
 }

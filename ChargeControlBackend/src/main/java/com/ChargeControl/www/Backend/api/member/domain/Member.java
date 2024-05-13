@@ -85,4 +85,8 @@ public class Member extends BaseTimeEntity implements UserDetails {
         return this.email;
     }
 
+    public Role getRole() {
+        return role;
+    }
+
 }

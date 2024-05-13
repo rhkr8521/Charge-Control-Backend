@@ -10,12 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -52,10 +52,13 @@ public class MemberController {
 
     @PostMapping("/refreshToken")
     public ResponseEntity<ApiResponse<JwtResponse>> refreshToken(@RequestBody RefreshTokenRequest refreshTokenRequest) {
-        memberService.verifyRefreshTokenExpiration(refreshTokenRequest.getToken());
+        Optional<Member> memberOptional = memberService.findByToken(refreshTokenRequest.getToken());
+        if (!memberOptional.isPresent()) {
+            throw new BadRequestException("유효한 RefreshToken이 아닙니다.");
+        }
 
-        Member member = memberService.findByToken(refreshTokenRequest.getToken())
-                .orElseThrow(TokenNotFoundException::new);
+        memberService.verifyRefreshTokenExpiration(refreshTokenRequest.getToken());
+        Member member = memberOptional.get();
 
         String accessToken = memberService.generateToken(member);
         JwtResponse jwtResponse = new JwtResponse(accessToken, refreshTokenRequest.getToken());
@@ -69,6 +72,7 @@ public class MemberController {
 
         return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/verify-email")
     public ResponseEntity<ApiResponse<Void>> getEmailForVerification(@RequestBody EmailRequest.EmailForVerificationRequest request) {
@@ -102,13 +106,21 @@ public class MemberController {
         }
 
         Object principal = authentication.getPrincipal();
-        if (principal instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) principal;
-            // 여기서 필요한 사용자 정보를 추출하여 반환
-            return ResponseEntity.ok(userDetails.getUsername());  // username 반환
+        if (principal instanceof Member) {
+            Member member = (Member) principal;
+
+            MemberResponse memberResponse = MemberResponse.builder()
+                    .email(member.getEmail())
+                    .name(member.getName())
+                    .carNumber(member.getCarNumber())
+                    .role(member.getRole())
+                    .build();
+
+            return ResponseEntity.ok(memberResponse);
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No valid member found in the security context");
     }
+
 
 }
