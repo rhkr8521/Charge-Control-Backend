@@ -13,13 +13,22 @@ import java.util.Optional;
 public class ViolationService {
     private final ViolationRepository violationRepository;
 
-    public List<Violation> findViolationsByCarNumber(String carNumber) {
-        return violationRepository.findByCarNumberAndResult(carNumber, "true");
+    String result = "true";
+
+    public List<Violation> findViolationsByCarNumberAndResult(String carNumber, boolean isAdmin) {
+        if (isAdmin) {
+            return violationRepository.findByResult(result);
+        } else {
+            return violationRepository.findByCarNumberAndResult(carNumber, result);
+        }
     }
 
-    public Optional<Violation> findValidViolationByCarNumberAndResult(Long violationId, String carNumber) {
-        return violationRepository.findById(violationId)
-                .filter(violation -> violation.getCarNumber().equals(carNumber) && violation.getResult().equals("true"));
+    public Optional<Violation> findValidViolation(Long violationId, String carNumber, boolean isAdmin) {
+        if (isAdmin) {
+            return violationRepository.findByViolationIdAndResult(violationId, result);
+        } else {
+            return violationRepository.findById(violationId)
+                    .filter(violation -> violation.getCarNumber().equals(carNumber) && "true".equals(violation.getResult()));
+        }
     }
-
 }

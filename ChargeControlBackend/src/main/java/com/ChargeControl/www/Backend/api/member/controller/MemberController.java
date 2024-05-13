@@ -73,7 +73,6 @@ public class MemberController {
         return ResponseEntity.ok(response);
     }
 
-
     @PostMapping("/verify-email")
     public ResponseEntity<ApiResponse<Void>> getEmailForVerification(@RequestBody EmailRequest.EmailForVerificationRequest request) {
         LocalDateTime requestedAt = LocalDateTime.now();

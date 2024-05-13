@@ -1,6 +1,5 @@
 package com.ChargeControl.www.Backend.api.violation.dto;
 
-import com.ChargeControl.www.Backend.api.member.domain.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
