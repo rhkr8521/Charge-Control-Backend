@@ -34,7 +34,8 @@ public class MemberServiceImpl implements MemberService {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    private Long accessTokenValidityMs = 900_000L; // 엑세스토큰 15분 유효시간
+    //private Long accessTokenValidityMs = 900_000L; // 엑세스토큰 15분 유효시간
+    private Long accessTokenValidityMs = 7 * 24 * 60 * 60 * 1000L; // 엑세스토큰 일주일 유효시간
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
