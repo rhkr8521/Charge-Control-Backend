@@ -9,11 +9,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class ViolationResponse {
+public class ViolationResponseDto {
 
     private long id;
     private String carNumber;
     private String carImage;
     private String violationContent;
     private String violationPlace;
+    private String violationDate;
+
 }
