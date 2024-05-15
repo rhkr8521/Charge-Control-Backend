@@ -73,4 +73,18 @@ public class Question extends BaseTimeEntity {
                 .build();
     }
 
+    public Question unmarkAnswered() {
+        return Question.builder()
+                .questionId(this.questionId)
+                .title(this.title)
+                .content(this.content)
+                .writer(this.writer)
+                .carNumber(this.carNumber)
+                .isWrite(false)
+                .violation(this.violation)
+                .createdAt(this.createdAt)
+                .updatedAt(this.updatedAt)
+                .build();
+    }
+
 }
