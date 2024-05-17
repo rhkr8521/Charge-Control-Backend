@@ -138,4 +138,34 @@ public class QuestionController {
                 .build());
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<?> searchQuestions(@RequestParam(required = false) String title,
+                                             @RequestParam(required = false) String content,
+                                             @RequestParam(required = false) String writer,
+                                             @RequestParam(required = false) String carNumber,
+                                             Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("인증이 완료되지 않았습니다.");
+        }
+
+        if (!(authentication.getPrincipal() instanceof Member)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("사용자 인증 실패");
+        }
+
+        Member member = (Member) authentication.getPrincipal();
+
+        if (!member.getRole().equals(Role.ADMIN)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("검색 권한이 없습니다.");
+        }
+
+        List<QuestionResponseDto> questionResponses = questionService.searchQuestions(title, content, writer, carNumber);
+
+        return ResponseEntity.ok(ApiResponse.<List<QuestionResponseDto>>builder()
+                .status(HttpStatus.OK.value())
+                .success(true)
+                .message("이의신청 검색 성공")
+                .data(questionResponses)
+                .build());
+    }
+
 }

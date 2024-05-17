@@ -88,6 +88,28 @@ public class QuestionService {
         questionRepository.delete(question);
     }
 
+    public List<QuestionResponseDto> searchQuestions(String title, String content, String writer, String carNumber) {
+        List<Question> questions = questionRepository.findAll();
+
+        if (title != null) {
+            questions = questions.stream().filter(q -> q.getTitle().contains(title)).collect(Collectors.toList());
+        }
+
+        if (content != null) {
+            questions = questions.stream().filter(q -> q.getContent().contains(content)).collect(Collectors.toList());
+        }
+
+        if (writer != null) {
+            questions = questions.stream().filter(q -> q.getWriter().contains(writer)).collect(Collectors.toList());
+        }
+
+        if (carNumber != null) {
+            questions = questions.stream().filter(q -> q.getCarNumber().contains(carNumber)).collect(Collectors.toList());
+        }
+
+        return questions.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
     private QuestionResponseDto mapToDto(Question question) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = question.getCreatedAt().format(formatter);
