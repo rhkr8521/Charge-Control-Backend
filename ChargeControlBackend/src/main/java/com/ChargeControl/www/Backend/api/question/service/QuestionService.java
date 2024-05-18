@@ -88,26 +88,42 @@ public class QuestionService {
         questionRepository.delete(question);
     }
 
-    public List<QuestionResponseDto> searchQuestions(String title, String content, String writer, String carNumber) {
+    public List<QuestionResponseDto> searchQuestions(String title, String content, String writer, String carNumber, boolean isAdmin, String userCarNumber) {
         List<Question> questions = questionRepository.findAll();
 
         if (title != null) {
-            questions = questions.stream().filter(q -> q.getTitle().contains(title)).collect(Collectors.toList());
+            questions = questions.stream()
+                    .filter(q -> q.getTitle().contains(title))
+                    .collect(Collectors.toList());
         }
 
         if (content != null) {
-            questions = questions.stream().filter(q -> q.getContent().contains(content)).collect(Collectors.toList());
+            questions = questions.stream()
+                    .filter(q -> q.getContent().contains(content))
+                    .collect(Collectors.toList());
         }
 
-        if (writer != null) {
-            questions = questions.stream().filter(q -> q.getWriter().contains(writer)).collect(Collectors.toList());
+        if (!isAdmin) {
+            questions = questions.stream()
+                    .filter(q -> q.getCarNumber().equals(userCarNumber))
+                    .collect(Collectors.toList());
+        } else {
+            if (writer != null) {
+                questions = questions.stream()
+                        .filter(q -> q.getWriter().equals(writer))
+                        .collect(Collectors.toList());
+            }
+
+            if (carNumber != null) {
+                questions = questions.stream()
+                        .filter(q -> q.getCarNumber().equals(carNumber))
+                        .collect(Collectors.toList());
+            }
         }
 
-        if (carNumber != null) {
-            questions = questions.stream().filter(q -> q.getCarNumber().contains(carNumber)).collect(Collectors.toList());
-        }
-
-        return questions.stream().map(this::mapToDto).collect(Collectors.toList());
+        return questions.stream()
+                .map(this::mapToDto)
+                .collect(Collectors.toList());
     }
 
     private QuestionResponseDto mapToDto(Question question) {
