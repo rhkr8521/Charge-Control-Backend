@@ -48,7 +48,8 @@ public class SecurityConfig {
                     @Override
                     public CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
                         CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(Collections.singletonList("http://chargecontrol.o-r.kr"));
+                        config.setAllowedOrigins(Collections.singletonList("https://www.chargecontrol.r-e.kr"));
+                        config.setAllowedOrigins(Collections.singletonList("https://www.chargecontrol.kro.kr"));
                         config.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
                         config.setAllowedMethods(Collections.singletonList("*"));
                         config.setAllowCredentials(true);
