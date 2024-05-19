@@ -31,6 +31,8 @@ public class Member extends BaseTimeEntity implements UserDetails {
 
     private String carNumber;
 
+    private String phoneNumber;
+
     @Column(nullable = false)
     private String name;
 

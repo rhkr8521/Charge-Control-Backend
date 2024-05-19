@@ -58,10 +58,11 @@ public class MemberServiceImpl implements MemberService {
                 .password(passwordEncoder.encode(requestDto.getPassword()))
                 .name(requestDto.getName())
                 .carNumber(requestDto.getCarNumber())
+                .phoneNumber(requestDto.getPhoneNumber())
                 .build();
 
         // 특정 도메인일 경우 Admin 권한 부여
-        if (requestDto.getEmail().endsWith("@rhkr8521.com")) {
+        if (requestDto.getEmail().endsWith("@chungbuk.ac.kr")) {
             member.addAdminAuthority();
         } else {
             member.addUserAuthority();
