@@ -62,7 +62,7 @@ public class SecurityConfig {
                     }
                 }))
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("health","/api/v1/login", "/api/v1/join", "/api/v1/verify-email", "/api/v1/verification-code", "api/v1/refreshToken","api/v1/chargerlocation/all","/h2-console/**").permitAll()
+                        .requestMatchers("health","/api/v1/login", "/api/v1/join", "/api/v1/verify-email", "/api/v1/verification-code", "api/v1/refreshToken","api/v1/chargerlocation/all","api/v1/sms/send-one/**","/h2-console/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers((headerConfig) ->
