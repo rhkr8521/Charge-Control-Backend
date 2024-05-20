@@ -26,6 +26,7 @@ public class MemberSignUpRequestDto {
 
     private String checkedPassword;
     private String carNumber;
+    private String phoneNumber;
 
     private com.ChargeControl.www.Backend.api.member.domain.Role role;
 
@@ -37,6 +38,7 @@ public class MemberSignUpRequestDto {
                 .password(password)
                 .role(Role.USER)
                 .carNumber(carNumber)
+                .phoneNumber(phoneNumber)
                 .build();
     }
 }
