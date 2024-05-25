@@ -22,9 +22,9 @@ jobs:
     - name: create application.yml
       run: |
         ## create application.yml
-        
-        mkdir ../../ChargeControlBackend/src/main/resources
-        cd ../../ChargeControlBackend/src/main/resources
+        cd ~
+        mkdir ./ChargeControlBackend/src/main/resources
+        cd ./ChargeControlBackend/src/main/resources
 
         # application.yml 파일 생성
         touch ./application.yml
