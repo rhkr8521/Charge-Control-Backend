@@ -43,10 +43,10 @@ public class SmsController {
     public SingleMessageSentResponse sendOne(@PathVariable String carNumber) {
         Member member = memberRepository.findByCarNumber(carNumber);
         Message message = new Message();
-        // 발신번호 및 수신번호는 반드시 01012345678 형태로 입력되어야 합니다.
         message.setFrom(senderNumber);
         message.setTo(member.getPhoneNumber());
-        message.setText("[ChargeControl]\n"+member.getName()+ "님의 주차가 확인되었습니다. 2시간 내 미출차 시 [환경친화적자동차의 개발 및 보급 촉진에 관한 법률] 제18조 2항 위반으로 과태료가 부과됩니다.");
+        message.setText("[ChargeControl]\n"+member.getName()+ "님의 주차가 확인되었습니다.\n"
+                + " 2시간 내 미출차 시 [환경친화적자동차의 개발 및 보급 촉진에 관한 법률] 제18조 2항 위반으로 과태료가 부과됩니다.");
 
         SingleMessageSentResponse response = this.messageService.sendOne(new SingleMessageSendingRequest(message));
         System.out.println(response);
