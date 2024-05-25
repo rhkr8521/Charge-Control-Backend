@@ -38,6 +38,6 @@ jobs:
       
     - name: build
       run: |
-          chmod +x gradlew
+          chmod +x ./ChargeControlBackend/gradlew
           ./ChargeControlBackend/gradlew build -x test
       shell: bash
