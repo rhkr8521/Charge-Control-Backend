@@ -54,6 +54,9 @@ dependencies {
 
 	// H2
 	//runtimeOnly 'com.h2database:h2'
+
+	//coolSMS를 위한 의존성 추가
+	implementation 'net.nurigo:sdk:4.3.0'
 }
 
 tasks.named('test') {
