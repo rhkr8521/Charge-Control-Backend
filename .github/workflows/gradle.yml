@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
+
     # 1. Java 17 세팅
     - name: Set up JDK 17
       uses: actions/setup-java@v3
@@ -25,18 +26,19 @@ jobs:
     # 2. application.yml 파일 생성
     - name: Create application.yml
       run: |
-        mkdir -p src/main/resources
-        echo "${{ secrets.CI_APPLICATION }}" > src/main/resources/application.yml
+        mkdir -p ChargeControlBackend/src/main/resources
+        echo "${{ secrets.CI_APPLICATION }}" > ChargeControlBackend/src/main/resources/application.yml
 
     # 3. Spring Boot 애플리케이션 빌드
     - name: Build with Gradle
       uses: gradle/gradle-build-action@v2
       with:
         gradle-executable: ./gradlew
+        working-directory: ChargeControlBackend
 
     # 4. Docker 이미지 빌드
     - name: docker image build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chargecontrol_backend .
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chargecontrol_backend -f ChargeControlBackend/Dockerfile ChargeControlBackend
 
     # 5. DockerHub 로그인
     - name: docker login
