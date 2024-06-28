@@ -1,4 +1,4 @@
-name: CI
+name: rhkr8521 CI
 
 on:
   push:
@@ -31,7 +31,9 @@ jobs:
       shell: bash
 
     - name: docker image build
-      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chargecontrol_backend -f ChargeControlBackend/Dockerfile ChargeControlBackend
+      run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/chargecontrol_backend .
+      # Dockerfile과 빌드 컨텍스트가 모두 루트 디렉토리에 있도록 설정
+      working-directory: ./
 
     - name: docker login
       uses: docker/login-action@v2
